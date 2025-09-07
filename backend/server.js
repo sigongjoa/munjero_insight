@@ -21,7 +21,12 @@ const app = express();
 const PORT = process.env.PORT || 3002;
 
 // --- Redis Session Store ---
-let redisClient = createClient(process.env.REDIS_URL || 'redis://localhost:6379'); // Use REDIS_URL
+let redisClient = createClient({
+  socket: {
+    host: 'redis',
+    port: 6379
+  }
+});
 redisClient.connect().catch(console.error);
 let redisStore = new RedisStore({ client: redisClient });
 
