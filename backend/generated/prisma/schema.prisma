@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  projects  Project[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Project {
+  id              String   @id @default(cuid())
+  channelId       String   @unique
+  channelName     String
+  subscriberCount Int?
+  category        String?
+  language        String?
+  region          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  videos          Video[]
+}
+
+model Video {
+  id             String   @id @default(cuid())
+  videoId        String   @unique
+  title          String
+  description    String?
+  tags           String[] @default([])
+  uploadTime     DateTime
+  duration       Int?
+  views          BigInt?
+  likes          BigInt?
+  dislikes       BigInt?
+  commentsCount  Int?
+  impressions    BigInt?
+  ctr            Float?
+  avgWatchTime   Int?
+  retentionCurve Json?
+  hookLength     Int?
+  ctaPosition    String?
+  sceneCuts      Json?
+  scriptSegments Json?
+  subtitleText   String?
+  editingPattern String?
+  projectId      String
+  project        Project  @relation(fields: [projectId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

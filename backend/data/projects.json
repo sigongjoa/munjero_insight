@@ -1,0 +1,29 @@
+[
+  {
+    "id": "proj-1756912873167",
+    "name": "123",
+    "description": "123",
+    "shorts": [
+      {
+        "id": "short-proj-1756912873167-1756912875848",
+        "projectId": "proj-1756912873167",
+        "title": "123",
+        "status": "Idea",
+        "script": {
+          "idea": "",
+          "draft": "",
+          "hook": "",
+          "immersion": "",
+          "body": "",
+          "cta": ""
+        },
+        "metadata": {
+          "tags": "",
+          "cta": "",
+          "imageIdeas": "",
+          "audioNotes": ""
+        }
+      }
+    ]
+  }
+]

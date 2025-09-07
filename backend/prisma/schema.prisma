@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  googleId     String?   @unique
+  email        String    @unique
+  name         String?
+  accessToken  String?
+  refreshToken String?
+  projects     Project[]
+}
+
+model Project {
+  id              String    @id @default(cuid())
+  channelId       String    @unique
+  channelName     String
+  subscriberCount Int?
+  category        String?
+  language        String?
+  region          String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  videos          Video[]
+}
+
+model Video {
+  id          String    @id @default(cuid())
+  videoId     String    @unique
+  title       String
+  description String?
+  uploadTime  DateTime
+  duration    Int?
+  tags        String[]
+  status      String    @default("Not Analyzed") // Not Analyzed, Pending, Completed, Failed
+  analysis    Json?     // Store transcript, scenes, etc.
+
+  project   Project @relation(fields: [projectId], references: [id])
+  projectId String
+}

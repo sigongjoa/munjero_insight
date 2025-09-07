@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: shorts-postgres
+    environment:
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: postgres
+    ports:
+      - "51214:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: shorts-backend
+    ports:
+      - "3000:3002" # Host port 3000 -> Container port 3002
+    environment:
+      DATABASE_URL: "postgresql://postgres:yourpassword@db:5432/postgres"
+      PORT: 3002
+      SESSION_SECRET: "your_session_secret"
+      REDIS_URL: "redis://redis:6379" # New: Redis connection URL
+    depends_on:
+      - db
+      - analyzer
+      - redis # New: Depend on Redis
+    volumes:
+      - ./backend:/app
+
+  redis: # New Redis service
+    image: redis:latest
+    container_name: shorts-redis
+    volumes:
+      - redis_data:/data # Persist Redis data
+
+  analyzer:
+    build: ./backend/video_analyzer
+    container_name: shorts-video-analyzer
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/video_analyzer:/app
+      - chroma_data:/app/chroma_db # Persist ChromaDB data
+      - ./temp_videos:/app/temp_videos
+    environment:
+      LM_STUDIO_URL: http://host.docker.internal:1234 # For Docker Desktop. For Linux, use `http://172.17.0.1:1234`
+
+  frontend:
+    build: ./frontend
+    container_name: shorts-frontend
+    ports:
+      - "5174:80" # Map host port 5174 to container port 80 (where Nginx is listening)
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+  chroma_data:
+  redis_data: # New: Volume for Redis data

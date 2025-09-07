@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+yt-dlp
+scenedetect[opencv]
+openai-whisper
+easyocr
+chromadb
+sentence-transformers
