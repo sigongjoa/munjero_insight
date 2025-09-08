@@ -61,6 +61,7 @@ export const googleAuthCallback = async (req, res) => {
 
     console.log('Tokens received and stored in DB for user:', user.id);
     console.log('User ID stored in session:', req.session.user.id);
+    console.log('Session object after setting user:', req.session);
 
     res.redirect('http://localhost:5174');
   } catch (error) {
@@ -70,8 +71,9 @@ export const googleAuthCallback = async (req, res) => {
 };
 
   export const checkAuthStatus = (req, res) => {
-  if (req.session.userId) {
-    res.status(200).json({ authenticated: true, userId: req.session.userId });
+  console.log('Session in checkAuthStatus:', req.session);
+  if (req.session.user && req.session.user.id) {
+    res.status(200).json({ authenticated: true, user: req.session.user });
   } else {
     res.status(401).json({ authenticated: false });
   }

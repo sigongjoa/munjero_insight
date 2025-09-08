@@ -55,7 +55,7 @@ app.use(session({
   cookie: {
     httpOnly: true,
     secure: false, // Set to false for development with sameSite: 'none'
-    sameSite: 'none' // Allow cross-site cookie sending for development
+    sameSite: 'lax' // Allow cross-site cookie sending for development
   }
 }));
 
@@ -93,7 +93,7 @@ app.use('/api/video', videoRoutes);
 // GET all projects
 app.get('/api/projects', async (req, res) => {
   try {
-    const userId = req.session.userId;
+    const userId = req.userId;
     const projects = await prisma.project.findMany({
       where: { userId: userId },
       include: { videos: true },
@@ -111,7 +111,7 @@ app.get('/api/projects', async (req, res) => {
 app.put('/api/projects/:projectId', async (req, res) => {
   try {
     const { projectId } = req.params;
-    const userId = req.session.userId;
+    const userId = req.userId;
     const updatedProjectData = req.body;
 
     const updatedProject = await prisma.project.update({
@@ -130,7 +130,7 @@ app.put('/api/projects/:projectId', async (req, res) => {
 app.delete('/api/projects/:projectId', async (req, res) => {
   try {
     const { projectId } = req.params;
-    const userId = req.session.userId;
+    const userId = req.userId;
 
     await prisma.video.deleteMany({
       where: { projectId: projectId },
@@ -153,7 +153,7 @@ app.delete('/api/projects/:projectId', async (req, res) => {
 app.get('/api/projects/:projectId/shorts', async (req, res) => {
   try {
     const { projectId } = req.params;
-    const userId = req.session.userId;
+    const userId = req.userId;
 
     const videos = await prisma.video.findMany({
       where: { projectId: projectId, project: { userId: userId } },
@@ -169,7 +169,7 @@ app.get('/api/projects/:projectId/shorts', async (req, res) => {
 app.post('/api/projects/:projectId/shorts', async (req, res) => {
   try {
     const { projectId } = req.params;
-    const userId = req.session.userId;
+    const userId = req.userId;
     const { videoId, title, description, uploadTime, duration, tags } = req.body;
 
     if (!videoId || !title || !uploadTime) {
@@ -199,7 +199,7 @@ app.post('/api/projects/:projectId/shorts', async (req, res) => {
 app.put('/api/projects/:projectId/shorts/:shortId', async (req, res) => {
   try {
     const { shortId } = req.params;
-    const userId = req.session.userId;
+    const userId = req.userId;
     const updatedVideoData = req.body;
 
     const video = await prisma.video.findUnique({ where: { id: shortId } });
@@ -223,7 +223,7 @@ app.put('/api/projects/:projectId/shorts/:shortId', async (req, res) => {
 app.delete('/api/projects/:projectId/shorts/:shortId', async (req, res) => {
   try {
     const { shortId } = req.params;
-    const userId = req.session.userId;
+    const userId = req.userId;
 
     const video = await prisma.video.findUnique({ where: { id: shortId } });
     if (!video || video.project.userId !== userId) {
@@ -245,7 +245,7 @@ app.delete('/api/projects/:projectId/shorts/:shortId', async (req, res) => {
 app.post('/api/projects/:projectId/sync', async (req, res) => {
   try {
     const { projectId } = req.params;
-    const userId = req.session.userId;
+    const userId = req.userId;
 
     syncProjectVideos(userId, projectId);
 
